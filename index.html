@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiskWala Video Player</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            background-color: #0f0f13;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 15px;
+            margin: 0;
+        }
+        h2 { color: #a855f7; margin-bottom: 15px; }
+        .input-box {
+            width: 90%;
+            max-width: 400px;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #374151;
+            background: #1f2937;
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 15px;
+            outline: none;
+        }
+        .player-container {
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto 15px auto;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #374151;
+        }
+        video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .btn {
+            display: block;
+            width: 93%;
+            max-width: 424px;
+            margin: 10px auto;
+            padding: 12px;
+            border-radius: 25px;
+            border: none;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        }
+        .btn-alt {
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+        }
+        .warning-box {
+            background: rgba(234, 179, 8, 0.1);
+            border: 1px solid rgba(234, 179, 8, 0.3);
+            color: #facc15;
+            padding: 10px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+            margin: 15px auto;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>DiskWala Video Downloader</h2>
+    
+    <input type="text" id="linkInput" class="input-box" placeholder="Enter DiskWala Link...">
+    <button class="btn" onclick="loadVideo()">Load & Play Video</button>
+
+    <!-- Video Player Box -->
+    <div class="player-container">
+        <video id="videoPlayer" controls>
+            Your browser does not support HTML5 video.
+        </video>
+    </div>
+
+    <button class="btn btn-alt" onclick="alert('Switching to alternate stream...')">Switch to Alternate Stream (High Quality)</button>
+
+    <div class="warning-box">
+        ⚠️️ Please try all available links. "High Speed" links are the most reliable.
+    </div>
+
+    <button class="btn" style="background: #1f2937; border: 1px solid #374151;" onclick="location.reload()">🔄 Generate New Link</button>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+
+        async function loadVideo() {
+            let link = document.getElementById('linkInput').value.trim();
+            if(!link) {
+                alert("Kripya link daalein!");
+                return;
+            }
+
+            let response = await fetch('/api/process', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: link })
+            });
+            
+            let data = await response.json();
+            if(data.success) {
+                let player = document.getElementById('videoPlayer');
+                player.src = data.stream_url;
+                player.load();
+                player.play().catch(e => alert("Stream load ho raha hai..."));
+            } else {
+                alert(data.message);
+            }
+        }
+    </script>
+</body>
+</html>
