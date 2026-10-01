@@ -27,10 +27,12 @@
             margin-bottom: 15px;
             outline: none;
         }
+        /* Shuru mein player chupa rahega */
         .player-container {
+            display: none; 
             width: 100%;
             max-width: 450px;
-            margin: 0 auto 15px auto;
+            margin: 15px auto;
             background: #000;
             border-radius: 10px;
             overflow: hidden;
@@ -56,9 +58,11 @@
             background: linear-gradient(135deg, #6366f1, #8b5cf6);
         }
         .btn-alt {
+            display: none; /* Player aane ke baad dikhega */
             background: linear-gradient(135deg, #8b5cf6, #ec4899);
         }
         .warning-box {
+            display: none;
             background: rgba(234, 179, 8, 0.1);
             border: 1px solid rgba(234, 179, 8, 0.3);
             color: #facc15;
@@ -73,25 +77,23 @@
 </head>
 <body>
 
-    <h2>DiskWala Video Downloader</h2>
+    <h2>DiskWala Video Player</h2>
     
     <input type="text" id="linkInput" class="input-box" placeholder="Enter DiskWala Link...">
     <button class="btn" onclick="loadVideo()">Load & Play Video</button>
 
-    <!-- Video Player Box -->
-    <div class="player-container">
+    <!-- Video Player Box (Initially Hidden) -->
+    <div class="player-container" id="playerContainer">
         <video id="videoPlayer" controls>
             Your browser does not support HTML5 video.
         </video>
     </div>
 
-    <button class="btn btn-alt" onclick="alert('Switching to alternate stream...')">Switch to Alternate Stream (High Quality)</button>
+    <button class="btn btn-alt" id="altBtn" onclick="alert('Switching to alternate stream...')">Switch to Alternate Stream (High Quality)</button>
 
-    <div class="warning-box">
-        ⚠️️ Please try all available links. "High Speed" links are the most reliable.
+    <div class="warning-box" id="warningBox">
+        ⚠ Please try all available links. "High Speed" links are the most reliable.
     </div>
-
-    <button class="btn" style="background: #1f2937; border: 1px solid #374151;" onclick="location.reload()">🔄 Generate New Link</button>
 
     <script>
         let tg = window.Telegram.WebApp;
@@ -100,7 +102,7 @@
         async function loadVideo() {
             let link = document.getElementById('linkInput').value.trim();
             if(!link) {
-                alert("Kripya link daalein!");
+                alert("Kripya pehle valid link daalein!");
                 return;
             }
 
@@ -112,10 +114,15 @@
             
             let data = await response.json();
             if(data.success) {
+                // Jaise hi click ho, player aur baaki buttons screen par aa jayein
+                document.getElementById('playerContainer').style.display = 'block';
+                document.getElementById('altBtn').style.display = 'block';
+                document.getElementById('warningBox').style.display = 'block';
+
                 let player = document.getElementById('videoPlayer');
                 player.src = data.stream_url;
                 player.load();
-                player.play().catch(e => alert("Stream load ho raha hai..."));
+                player.play().catch(e => console.log("Playback error:", e));
             } else {
                 alert(data.message);
             }
